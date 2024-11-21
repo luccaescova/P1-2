@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User } from "../models/User";
@@ -8,9 +8,14 @@ const router = Router();
 /**
  * Serviço para autenticação de usuários (Sign In)
  */
-router.post("/signIn", async (req, res) => {
+router.post("/signIn", async (req: Request, res: Response): Promise<Response> => {
     try {
         const { email, password } = req.body;
+
+        // Valida se o email e a senha foram fornecidos
+        if (!email || !password) {
+            return res.status(400).json({ message: "Email e senha são obrigatórios." });
+        }
 
         // Verifica se o usuário existe
         const user = await User.findOne({ where: { email } });
@@ -36,6 +41,7 @@ router.post("/signIn", async (req, res) => {
             token,
         });
     } catch (error) {
+        console.error("Erro ao realizar login:", error); // Log do erro para depuração
         res.status(500).json({ message: "Erro ao realizar login.", error });
     }
 });

@@ -4,6 +4,7 @@ import eventRoutes from "./routes/eventsRoutes";
 import betRoutes from "./routes/betRoutes";
 import walletRoutes from "./routes/walletRoutes";
 import createTables from "./utils/setupDB";
+import { AppDataSource } from "./config/appDataSource";
 
 const app = express();
 app.use(express.json());
@@ -22,3 +23,16 @@ app.listen(PORT, () => {
 
 // Executar o setup do banco
 createTables();
+
+
+AppDataSource.initialize()
+    .then(() => {
+        console.log("Banco de dados conectado!");
+
+        app.listen(3000, () => {
+            console.log("Servidor rodando na porta 3000");
+        });
+    })
+    .catch((error) => {
+        console.error("Erro ao conectar ao banco de dados:", error);
+    });

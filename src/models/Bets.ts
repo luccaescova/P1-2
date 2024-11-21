@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, BaseEntity } from "typeorm";
 import { User } from "./User";
-import { Event } from "./Event";
+import { Event } from "./Events";
 
 @Entity()
 export class Bet extends BaseEntity {

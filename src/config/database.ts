@@ -1,4 +1,4 @@
-import oracledb from "oracledb";
+/*import oracledb from "oracledb";
 import dotenv from "dotenv";
 dotenv.config();
 oracledb.initOracleClient(); // Opcional, caso precise configurar manualmente o cliente Oracle
@@ -18,4 +18,4 @@ export const connectToDB = async () => {
         console.error("Erro ao conectar ao banco de dados:", error);
         throw error;
     }
-};
+};*/
