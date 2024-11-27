@@ -1,37 +1,26 @@
-function isValid(email, password) {
-    if (email && password) {
-        return true;
-    } else if (!email && !password) {
-        showErrorMessage('Preencha os campos para fazer login');
-    } else if (!email) {
-        showErrorMessage('Preencha o email');
-    } else {
-        showErrorMessage('Preencha a senha');
-    }
-    return false; // Garantir um retorno booleano
-}
+document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('loginForm');
 
-function performLogin() {
-    const email = document.getElementById("fieldEmail").value;
-    const password = document.getElementById("fieldPassword").value;
+    // Simulação de um banco de dados de usuários
+    const usuarios = [
+        { email: 'usuario1@example.com', senha: 'senha123' },
+        { email: 'usuario2@example.com', senha: 'senha456' }
+    ];
 
-    if (isValid(email, password)) {
-        // Simulando verificação de usuário
-        const validUser = "usuario@exemplo.com";
-        const validPassword = "senha123";
+    loginForm.addEventListener('submit', function(event) {
+        event.preventDefault(); // Impede o envio do formulário para validação
 
-        if (email === validUser && password === validPassword) {
-            console.info("Login bem-sucedido!"); // Exemplo de sucesso
-            showErrorMessage('Login bem-sucedido!'); // Pode substituir por redirecionamento
+        const email = document.getElementById('email').value.trim();
+        const senha = document.getElementById('senha').value;
+
+        // Verifica se o usuário existe
+        const usuarioEncontrado = usuarios.find(usuario => usuario.email === email && usuario.senha === senha);
+
+        if (usuarioEncontrado) {
+            alert('Login realizado com sucesso!');
+            // Redirecionar ou realizar outra ação após o login bem-sucedido
         } else {
-            showErrorMessage('Usuário inexistente ou senha incorreta.');
+            alert('Email ou senha incorretos. Tente novamente.');
         }
-    }
-}
-
-function showErrorMessage(message) {
-    console.info("Mostrando mensagem de erro...");
-    var box = document.getElementById("messageBox");
-    document.getElementById("message").innerHTML = message;
-    box.style.display = "block"; // Sempre mostrar a caixa de mensagem
-}
+    });
+});

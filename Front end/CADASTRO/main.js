@@ -1,37 +1,29 @@
-function isValid(email, password) {
-    if (email && password) {
-        return true;
-    } else if (!email && !password) {
-        showErrorMessage('Preencha os campos para fazer login');
-    } else if (!email) {
-        showErrorMessage('Preencha o email');
-    } else {
-        showErrorMessage('Preencha a senha');
-    }
-    return false; // Garantir um retorno booleano
-}
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
 
-function performLogin() {
-    const email = document.getElementById("fieldEmail").value;
-    const password = document.getElementById("fieldPassword").value;
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); // Impede o envio do formulário para validação
 
-    if (isValid(email, password)) {
-        // Simulando verificação de usuário
-        const validUser = "usuario@exemplo.com";
-        const validPassword = "senha123";
+        const nome = document.getElementById('nome').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const senha = document.getElementById('senha').value;
+        const dataNascimento = document.getElementById('data-nascimento').value;
 
-        if (email === validUser && password === validPassword) {
-            console.info("Login bem-sucedido!"); // Exemplo de sucesso
-            showErrorMessage('Login bem-sucedido!'); // Pode substituir por redirecionamento
-        } else {
-            showErrorMessage('Usuário inexistente ou senha incorreta.');
+        // Validação
+        if (!nome || !email || !senha || !dataNascimento) {
+            alert('Por favor, preencha todos os campos.');
+            return;
         }
-    }
-}
 
-function showErrorMessage(message) {
-    console.info("Mostrando mensagem de erro...");
-    var box = document.getElementById("messageBox");
-    document.getElementById("message").innerHTML = message;
-    box.style.display = "block"; // Sempre mostrar a caixa de mensagem
-}
+        // Validação de email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            alert('Por favor, insira um email válido.');
+            return;
+        }
+
+        // Se tudo estiver correto, você pode enviar o formulário ou fazer outra ação
+        alert('Cadastro realizado com sucesso!');
+        form.reset(); // Limpa o formulário
+    });
+});
