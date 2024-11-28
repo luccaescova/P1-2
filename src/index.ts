@@ -10,7 +10,7 @@ import passport from "passport";
 import { ProfileHandler } from './models/User';
 
 
-const port = 3000;
+//const port = 3001;
 const server = express ();
 const routes = Router ();
 server.use(cors());
@@ -26,10 +26,10 @@ routes .post('/getWalletBalanse',
     ProfileHandler.getWalletBalance
 );
 server.use(routes);
-server.listen(port, ()=>{
+/*server.listen(port, ()=>{
     console.log(`Server is running on: ${port}`)
 }
-)
+)*/
 
 const app = express();
 app.use(express.json());
@@ -43,7 +43,7 @@ app.use("/wallet", walletRoutes);
 // Inicializar o banco de dados antes de iniciar o servidor
 const startServer = async () => {
     try {
-        const PORT = 3000; // Usar variável de ambiente para a porta
+        const PORT = 3001; // Usar variável de ambiente para a porta
 
         // Inicializar o banco de dados
         await AppDataSource.initialize();

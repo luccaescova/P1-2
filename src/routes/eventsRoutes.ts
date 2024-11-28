@@ -90,9 +90,15 @@ router.patch("/evaluateEvent", async (req: Request, res: Response): Promise<any>
 router.delete("/deleteEvent", async (req: Request, res: Response): Promise<any> => {
     try {
         const { eventId, userId } = req.body;
+        
+        // Verifica se o usuário existe
+        const user = await User.findOne({ where: { id: userId } });
+        if (!user) {
+            return res.status(404).json({ message: "Usuário não encontrado." });
+        }
 
         // Verifica se o evento pertence ao usuário
-        const event = await Event.findOne({ where: { id: eventId, creator: { id: userId } } });
+        const event = await Event.findOne({ where: { id: eventId, creator: user } });
         if (!event) {
             return res.status(404).json({ message: "Evento não encontrado ou acesso negado." });
         }

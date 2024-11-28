@@ -1,4 +1,4 @@
-import { connectToDB } from "../config/database";
+import { AppDataSource } from "../config/database";
 
 const createTables = async () => {
     const scripts = [
@@ -50,21 +50,45 @@ const createTables = async () => {
         )
         `
     ];
+    const queryRunner = AppDataSource.createQueryRunner();
+
+    // Inicia uma nova transação
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
     try {
-        const connection = await connectToDB();
+        for (const script of scripts) {
+            console.log(`Executando script:\n${script}`);
+            await queryRunner.query(script); // Executa o script SQL
+        }
+
+        // Se todos os scripts foram executados com sucesso, comita a transação
+        await queryRunner.commitTransaction();
+        console.log("Tabelas criadas com sucesso!");
+    } catch (error) {
+        console.error("Erro ao criar tabelas:", error);
+        // Se ocorrer um erro, desfaz a transação
+        await queryRunner.rollbackTransaction();
+    } finally {
+        // Libera o QueryRunner
+        await queryRunner.release();
+    }
+};
+
+    /*try {
+        const connection = await AppDataSource.initialize();
 
         for (const script of scripts) {
             console.log(`Executando script:\n${script}`);
-            await connection.execute(script);
+            await connection.query(script);
         }
 
         await connection.commit();
         console.log("Tabelas criadas com sucesso!");
-        await connection.close();
+        //await connection.close();
     } catch (error) {
         console.error("Erro ao criar tabelas:", error);
     }
-};
+};*/
 
 export default createTables;
