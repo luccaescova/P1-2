@@ -1,4 +1,27 @@
-import { runSQL } from "../utils/runSql";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, BaseEntity } from "typeorm";
+import { User } from "../models/User"; // Ajuste o caminho conforme necessário
+
+@Entity()
+export class WalletTransaction extends BaseEntity {
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @ManyToOne(() => User, (user: { id: any; }) => user.id)
+    user: User;
+
+    @Column("decimal", { precision: 10, scale: 2 })
+    amount: number;
+
+    @Column({ length: 20 })
+    type: "deposit" | "withdraw";
+
+    @Column({ nullable: true })
+    details: string;
+
+    @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+    timestamp: Date;
+}
+/*import { runSQL } from "../utils/runSql";
 
 const WalletTransaction = async () => {
     const sql = `
@@ -17,4 +40,4 @@ const WalletTransaction = async () => {
 };
 
 
-export {WalletTransaction} ;
+export {WalletTransaction} ;*/

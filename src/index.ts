@@ -3,7 +3,6 @@ import AuthRoutes from "./routes/authRoutes";
 import eventRoutes from "./routes/eventsRoutes";
 import betRoutes from "./routes/betRoutes";
 import walletRoutes from "./routes/walletRoutes";
-import createTables from "./utils/setupDB";
 import { AppDataSource } from "./config/appDataSource";
 
 const app = express();
@@ -16,19 +15,23 @@ app.use("/bets", betRoutes);
 app.use("/wallet", walletRoutes);
 
 // Inicializar o banco de dados antes de iniciar o servidor
-AppDataSource.initialize()
-    .then(() => {
+const startServer = async () => {
+    try {
+        const PORT = 3000; // Usar variável de ambiente para a porta
+
+        // Inicializar o banco de dados
+        await AppDataSource.initialize();
         console.log("Banco de dados conectado!");
 
-        // Executar o setup do banco (se necessário)
-        createTables();
-
-        // Iniciar o servidor após a conexão com o banco de dados
-        const PORT = 3000;
+        // Iniciar o servidor
         app.listen(PORT, () => {
             console.log(`Servidor rodando na porta ${PORT}`);
         });
-    })
-    .catch((error) => {
+    } catch (error) {
         console.error("Erro ao conectar ao banco de dados:", error);
-    });
+        process.exit(1); // Sair do processo em caso de erro
+    }
+};
+
+// Iniciar o servidor
+startServer();
