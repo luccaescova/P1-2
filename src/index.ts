@@ -4,6 +4,32 @@ import eventRoutes from "./routes/eventsRoutes";
 import betRoutes from "./routes/betRoutes";
 import walletRoutes from "./routes/walletRoutes";
 import { AppDataSource } from "./config/appDataSource";
+import {Request, Response, Router} from "express"
+import cors from "cors";
+import passport from "passport";
+import { ProfileHandler } from './models/User';
+
+
+const port = 3000;
+const server = express ();
+const routes = Router ();
+server.use(cors());
+
+routes.get('/', (req: Request, res: Response) => {
+    res.statusCode = 403;
+    res.send('Pagina ou serviço Inexistente')
+});
+
+routes.post('/login',ProfileHandler.loginHandler);
+routes .post('/getWalletBalanse',
+    passport.authenticate('jwt', {session:false}),
+    ProfileHandler.getWalletBalance
+);
+server.use(routes);
+server.listen(port, ()=>{
+    console.log(`Server is running on: ${port}`)
+}
+)
 
 const app = express();
 app.use(express.json());
