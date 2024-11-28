@@ -7,7 +7,36 @@
 </head>
 <body>
     <div class = "container">
-        <h1> Cadastro de Aposta </h1>
+        <h1>Cadastro de Aposta</h1>
+        <form id="cadastroApostaForm">
+            <div class="form-group">
+                <label for="title">Título do Evento:</label>
+                <input type="text" class="form-control" id="title" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Descrição:</label>
+                <input type="text" class="form-control" id="description" required>
+            </div>
+            <div class=" form-group">
+                <label for="betAmount">Valor da Aposta:</label>
+                <input type="number" class="form-control" id="betAmount" required>
+            </div>
+            <div class="form-group">
+                <label for="startDate">Data de Início:</label>
+                <input type="datetime-local" class="form-control" id="startDate" required>
+            </div>
+            <div class="form-group">
+                <label for="endDate">Data de Término:</label>
+                <input type="datetime-local" class="form-control" id="endDate" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Cadastrar Evento</button>
+        </form>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
+        <!--Problema relacionado a inserir informações para o backend por isso acabei comentando
+ <h1> Cadastro de Aposta </h1>
         <form>
             <p>
                 <label for="fieldName">Selecione a modalidade: </label>
@@ -43,4 +72,4 @@
         
         </div>
 </body>
-</html>
+</html> -->

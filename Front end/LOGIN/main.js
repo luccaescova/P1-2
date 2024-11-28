@@ -1,26 +1,50 @@
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.getElementById('loginForm');
 
-    // Simulação de um banco de dados de usuários
-    const usuarios = [
-        { email: 'usuario1@example.com', senha: 'senha123' },
-        { email: 'usuario2@example.com', senha: 'senha456' }
-    ];
-
     loginForm.addEventListener('submit', function(event) {
         event.preventDefault(); // Impede o envio do formulário para validação
 
         const email = document.getElementById('email').value.trim();
         const senha = document.getElementById('senha').value;
 
-        // Verifica se o usuário existe
-        const usuarioEncontrado = usuarios.find(usuario => usuario.email === email && usuario.senha === senha);
-
-        if (usuarioEncontrado) {
-            alert('Login realizado com sucesso!');
-            // Redirecionar ou realizar outra ação após o login bem-sucedido
-        } else {
-            alert('Email ou senha incorretos. Tente novamente.');
+        // Validação
+        if (!email || !senha) {
+            alert('Por favor, preencha todos os campos.');
+            return;
         }
+
+        // Dados do usuário a serem enviados
+        const loginData = {
+            email: email,
+            password: senha
+        };
+
+        // Enviar dados ao backend
+        fetch('http://localhost:3000/auth/signIn', { // Ajuste a URL conforme necessário
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(loginData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro na resposta do servidor');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert('Login bem-sucedido!'); // Mensagem de sucesso
+                localStorage.setItem('token', data.token); // Armazenar o token no localStorage
+                window.location.href = 'dashboard.html'; // Redirecionar para a página do dashboard
+            } else {
+                alert(data.message); // Mensagem de erro
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao fazer login:', error);
+            alert('Ocorreu um erro ao fazer login. Tente novamente.');
+        });
     });
 });
