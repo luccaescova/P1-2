@@ -1,47 +1,45 @@
-import { Router } from "express";
+import { Router, Request, Response } from "express";
 import { User } from "../models/User";
 import { WalletTransaction } from "../models/WalletTransaction";
-
+//import { authenticateToken } from "../middlewares/authenticateToken";
 const router = Router();
-
 /**
  * Adicionar fundos à carteira
  */
-router.post("/addFunds", async (req, res) => {
+router.post("/addFunds", async (req: Request, res: Response): Promise<any> => {
     try {
-        const { userId, amount } = req.body;
+        const { amount } = req.body;
 
         if (amount <= 0) {
             return res.status(400).json({ message: "O valor deve ser maior que zero." });
         }
 
-        // Verifica se o usuário existe
-        const user = await User.findOne({ where: { id: userId } });
+        const userIdNumber = req.body.userId; // Obtém o userId do middleware
+        const user = await User.findOne({ where: { id: userIdNumber } });
         if (!user) {
             return res.status(404).json({ message: "Usuário não encontrado." });
         }
 
-        // Adiciona o valor à carteira
         user.walletBalance += amount;
         await user.save();
 
-        // Registra a transação
         const transaction = new WalletTransaction();
         transaction.user = user;
         transaction.amount = amount;
-        transaction.type = "deposit"; // Tipo de transação: depósito
+        transaction.type = "deposit";
         await transaction.save();
 
-        res.status(200).json({ message: "Fundos adicionados com sucesso.", balance: user.walletBalance });
+        return res.status(200).json({ message: "Fundos adicionados com sucesso.", balance: user.walletBalance });
     } catch (error) {
-        res.status(500).json({ message: "Erro ao adicionar fundos.", error });
+        console.error(error);
+        return res.status(500).json({ message: "Erro ao adicionar fundos.", error });
     }
 });
 
 /**
  * Sacar fundos da carteira
  */
-router.post("/withdrawFunds", async (req, res) => {
+router.post("/withdrawFunds", async (req: Request, res: Response): Promise<any> => {
     try {
         const { userId, amount, bankDetails } = req.body;
 
@@ -49,18 +47,15 @@ router.post("/withdrawFunds", async (req, res) => {
             return res.status(400).json({ message: "O valor deve ser maior que zero." });
         }
 
-        // Verifica se o usuário existe
         const user = await User.findOne({ where: { id: userId } });
         if (!user) {
             return res.status(404).json({ message: "Usuário não encontrado." });
         }
 
-        // Verifica se há saldo suficiente
         if (user.walletBalance < amount) {
             return res.status(400).json({ message: "Saldo insuficiente." });
         }
 
-        // Calcula a taxa de saque
         let fee = 0;
         if (amount <= 100) {
             fee = amount * 0.04;
@@ -73,25 +68,24 @@ router.post("/withdrawFunds", async (req, res) => {
         }
         const finalAmount = amount - fee;
 
-        // Deduz o valor da carteira do usuário
         user.walletBalance -= amount;
         await user.save();
 
-        // Registra a transação
         const transaction = new WalletTransaction();
         transaction.user = user;
-        transaction.amount = -amount; // Valor negativo para saque
+        transaction.amount = -amount;
         transaction.type = "withdraw";
-        transaction.details = bankDetails; // Informações do banco
+        transaction.details = bankDetails;
         await transaction.save();
 
         res.status(200).json({
-            message: "Saque realizado com sucesso.",
+            message: " Saque realizado com sucesso.",
             balance: user.walletBalance,
             fee,
             finalAmount,
         });
     } catch (error) {
+        console.error(error); // Log do erro
         res.status(500).json({ message: "Erro ao realizar saque.", error });
     }
 });
@@ -99,17 +93,20 @@ router.post("/withdrawFunds", async (req, res) => {
 /**
  * Consultar saldo e histórico
  */
-router.get("/balance", async (req, res) => {
+router.get("/balance", async (req: Request, res: Response): Promise<any> => {
     try {
         const { userId } = req.query;
 
-        // Verifica se o usuário existe
-        const user = await User.findOne({ where: { id: userId } });
+        if (!userId || isNaN(Number(userId))) {
+            return res.status(400).json({ message: "userId é obrigatório e deve ser um número." });
+        }
+
+        const user = await User.findOne({ where: { id: Number(userId) } });
         if (!user) {
             return res.status(404).json({ message: "Usuário não encontrado." });
         }
 
-        // Busca o histórico de transações
+        // Agora que temos a instância do usuário, podemos usá-la na consulta
         const transactions = await WalletTransaction.find({ where: { user } });
 
         res.status(200).json({
@@ -117,8 +114,10 @@ router.get("/balance", async (req, res) => {
             transactions,
         });
     } catch (error) {
+        console.error(error); // Log do erro
         res.status(500).json({ message: "Erro ao consultar saldo.", error });
     }
 });
+
 
 export default router;

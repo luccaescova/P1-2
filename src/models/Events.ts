@@ -7,7 +7,7 @@ export class Event extends BaseEntity {
     id: number;
 
     @Column({length: 150})
-    result: string; //check type
+    result: string; 
 
     @Column({ length: 50 })
     title: string;

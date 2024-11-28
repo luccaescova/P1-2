@@ -1,8 +1,8 @@
-import { connectToDB } from "../config/database";
+import { AppDataSource } from "../config/database";
 
 export const executeQuery = async (query: string, params: any[] = []) => {
     try {
-        const connection = await connectToDB();
+        const connection = await AppDataSource();
         const result = await connection.execute(query, params, { autoCommit: true });
         await connection.close();
         return result.rows;
