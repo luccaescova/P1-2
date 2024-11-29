@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bootstrap demo</title>
+    <style>
+       
+    </style>
+    <link rel="stylesheet" href="styles.css">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  </head>
+  <body>
+    <div class="container text-center">
+        <div class="row align-items-center">
+            <div class="col">
+                <h1>Hakari's Bet</h1>
+            </div>
+            <div class="col">
+                <h4>
+                    <button id="carteiraButton">
+                        Minha Carteira
+                    </button>
+                </h4>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#eventmodal">
+                    Solicitar Evento
+                </button>
+            </div>
+        </div>
+    
+        <div id="carteiraModal" class="modal">
+            <div class="modal-content">
+                <span class="close" id="closeModal">&times;</span>
+                <h2>Carteira do Usuário</h2>
+                <p id="saldo">Saldo: R$ <span id="saldoValue">0.00</span></p>
+                <button id="depositarButton">Depositar</button>
+                <button id="retirarButton">Retirar</button>
+                <script src="script.js"></script>
+            </div>
+        </div>
+    
+        <!-- Modal para Solicitar Evento -->
+        <div class="modal fade" id="eventmodal" tabindex="-1" aria-labelledby="eventmodalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="eventmodalLabel">Solicitar Evento</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="eventRequestForm">
+                            <div class="mb-3">
+                                <label for="eventSelect" class="form-label">Escolha o evento</label>
+                                <select class="form-select form-select-lg mb-3" id="eventSelect" required>
+                                    <option selected>Escolha o evento</option>
+                                    <option value="Fortnite">Fortnite</option>
+                                    <option value="CS:GO">CS:GO</option>
+                                    <option value="Valorant">Valorant</option>
+                                    <option value="SpeedRun">SpeedRun</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="categorySelect" class="form-label">Escolha a categoria</label>
+                                <select class="form-select form-select-lg mb-3" id="categorySelect" required>
+                                    <option selected>Escolha a categoria</option>
+                                    <option value="Torneio por Dinheiro">Torneio por Dinheiro</option>
+                                    <option value="Torneio Amistoso">Torneio Amistoso</option>
+                                    <option value="Torneio Nacional">Torneio Nacional</option>
+                                    <option value="Torneio Mundial">Torneio Mundial</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="startDate" class="form-label">Data de Início</label>
+                                <input type="date" class="form-control" id="startDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="endDate" class="form-label">Data de Término</label>
+                                <input type="date" class="form-control" id="endDate" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Confirmar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!-- Seção de Avaliação -->
+    <div class="container-sm" style="padding: 50px;">
+        <h2>Avaliação de Eventos Solicitados</h2>
+        <div id="evaluationSection">
+            <p>Não há eventos solicitados para avaliação.</p>
+        </div>
+    </div>
+
+    <!-- Tabela de Eventos Disponíveis -->
+    <div class="container-sm" style="padding: 50px;">
+        <h2>Eventos Disponíveis</h2>
+        <table class="table" style="border: 2px solid black;">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Evento</th>
+                    <th scope="col">Data de Término</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Apostas</th>
+                </tr>
+            </thead>
+            <tbody id="eventsTableBody" class="table" style="border: 2px solid black;">
+                <!-- Eventos aprovados serão adicionados aqui -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const eventsPerPage = 10; // Número de eventos por página
+        const totalEvents = 20; // Total de eventos (ajuste conforme necessário)
+
+        // Inicializa o saldo da carteira a partir do valor exibido no modal
+        let walletBalance = parseFloat(document.getElementById('saldoValue').innerText);
+
+        // Manipulação do formulário de solicitação de evento
+        document.getElementById('eventRequestForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Impede o envio do formulário
+
+            // Captura os dados do evento
+            const eventName = document.getElementById('eventSelect').value;
+            const categoryName = document.getElementById('categorySelect').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            // Cria uma nova solicitação de evento
+            const requestHTML = `
+                <div class="request">
+                    <p>Evento: ${eventName} | Categoria: ${categoryName} | Data de Início: ${startDate} | Data de Término: ${endDate}</p>
+                    <button class="btn btn-success" onclick="approveEvent('${eventName}', '${endDate}')">Aprovar</button>
+                    <button class="btn btn-danger" onclick="rejectEvent(this)">Rejeitar</button>
+                </div>
+            `;
+
+            // Adiciona a solicitação à seção de avaliação
+            const evaluationSection = document.getElementById('evaluationSection');
+            evaluationSection.innerHTML += requestHTML;
+
+            // Limpa o formulário de solicitação após a submissão
+            document.getElementById('eventRequestForm').reset();
+        });
+
+        // Função para aprovar um evento
+        function approveEvent(eventName, endDate) {
+            // Adiciona o evento à tabela de eventos disponíveis
+            const eventsTableBody = document.getElementById('eventsTableBody');
+            const newRow = document.createElement('tr');
+            const newEventNumber = eventsTableBody.children.length + 1; // Número do evento baseado na quantidade atual
+
+            newRow.innerHTML = `
+                <th scope="row">${newEventNumber}</th>
+                <td>${eventName}</td>
+                <td>${endDate}</td>
+                <td>Em Andamento</td>
+                <td>
+                    <form onsubmit="placeBet(event, '${eventName}')">
+                        <select required>
+                            <option value="">Selecione um time</option>
+                            <option value="furia">FURIA</option>
+                            <option value="loud">LOUD</option>
+                            <option value="w7m">W7M</option>
+                            <option value="liquid">LIQUID</option>
+                        </select>
+                        <input type="number" min="1" placeholder="Valor da Aposta" required>
+                        <button type="submit" class="btn btn-primary">Apostar</button>
+                    </form>
+                </td>
+            `;
+            eventsTableBody.appendChild(newRow);
+
+            // Remove a solicitação aprovada da seção de avaliação
+            const requestDiv = event.target.closest('.request');
+            requestDiv.remove();
+        }
+
+        // Função para rejeitar um evento
+        function rejectEvent(button) {
+      // Remove a solicitação rejeitada da seção de avaliação
+      const requestDiv = button.closest('.request');
+                requestDiv.remove();
+            }
+
+            // Função para processar a aposta
+            function placeBet(event, eventName) {
+                event.preventDefault(); // Impede o envio do formulário
+
+                const form = event.target;
+                const selectedTeam = form.querySelector('select').value;
+                const betAmount = parseFloat(form.querySelector('input[type="number"]').value);
+
+                if (selectedTeam && betAmount > 0) {
+                    // Verifica se o usuário tem saldo suficiente
+                    if (betAmount <= walletBalance) {
+                        walletBalance -= betAmount; // Deduz o valor da aposta do saldo
+                        document.getElementById('saldoValue').innerText = walletBalance.toFixed(2); // Atualiza o saldo exibido
+
+                        alert(`Aposta de R$ ${betAmount.toFixed(2)} no time ${selectedTeam} para o evento ${eventName} foi realizada com sucesso!`);
+                    } else {
+                        alert('Saldo insuficiente para realizar a aposta.');
+                    }
+                } else {
+                    alert('Por favor, selecione um time e insira um valor válido para a aposta.');
+                }
+            }
+        </script>
+    
+        <div class="pagination">
+            <button id="prevPage" class="btn btn-secondary" onclick="changePage(-1)">Anterior</button>
+            <button id="nextPage" class="btn btn-secondary" onclick="changePage(1)">Próximo</button>
+        </div>
+    </div>
+    
+    <div id="carteiraModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2>Carteira do Usuário</h2>
+            <p id="saldo">Saldo: R$ <span id="saldoValue">100.00</span></p>
+            <button id="depositarButton">Depositar</button>
+            <button id="retirarButton">Retirar</button>
+        </div>
+    </div>
+    
+    <script>
+        let currentPage1 = 1;
+        const eventsPerPage2 = 10; // Número de eventos por página
+        const totalEvents2 = 20; // Total de eventos (ajuste conforme necessário)
+    
+        // Inicializa o saldo da carteira a partir do valor exibido no modal
+        let walletBalance2 = parseFloat(document.getElementById('saldoValue').innerText);
+    
+        function changePage(direction) {
+            currentPage += direction;
+    
+            // Lógica para garantir que a página atual não exceda os limites
+            if (currentPage < 1) {
+                currentPage = 1;
+            } else if (currentPage > Math.ceil(totalEvents / eventsPerPage)) {
+                currentPage = Math.ceil(totalEvents / eventsPerPage);
+            }
+    
+            console.log(`Mudando para a página ${currentPage}`);
+            // Atualize a tabela de eventos aqui
+        }
+    
+        function placeBet(event, eventName) {
+            event.preventDefault(); // Evita o envio do formulário
+    
+            const team = event.target.querySelector('select').value;
+            const betAmount = parseFloat(event.target.querySelector('input').value);
+    
+            // Verifica se o valor da aposta é válido
+            if (betAmount <= 0 || betAmount > walletBalance) {
+                alert('Valor da aposta inválido ou saldo insuficiente.');
+                return;
+            }
+    
+            // Atualiza o saldo da carteira
+            walletBalance -= betAmount;
+    
+            // Atualiza o valor exibido no modal
+            document.getElementById('saldoValue').innerText = walletBalance.toFixed(2);
+    
+                    // Exibe mensagem de sucesso
+        alert(`Aposta de R$${betAmount.toFixed(2)} feita no evento "${eventName}" no time ${team}.`);
+        console.log(`Novo saldo da carteira: R$${walletBalance.toFixed(2)}`);
+
+        // Limpa o formulário
+        event.target.reset();
+    }
+
+    // Funções para abrir e fechar o modal da carteira
+    const modal = document.getElementById('carteiraModal');
+    const closeModal = document.getElementById('closeModal');
+
+    closeModal.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // Função para abrir o modal (pode ser chamada em um evento, como um botão)
+    function openWalletModal() {
+        modal.style.display = "block";
+    }
+
+    // Fechar o modal ao clicar fora dele
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+</script>
+
+
+    <!--tirar os arquivos do cdn-->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  </body>
+</html>
