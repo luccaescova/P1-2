@@ -51,42 +51,41 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form>
+                        <form id="eventRequestForm">
                             <div class="mb-3">
-                                <label for="exampleInputEvent" class="form-label">Escolha o evento</label>
-                                <select class="form-select form-select-lg mb-3" aria-label="Large select example">
+                                <label for="eventSelect" class="form-label">Escolha o evento</label>
+                                <select class="form-select form-select-lg mb-3" id="eventSelect" required>
                                     <option selected>Escolha o evento</option>
-                                    <option value="1">Fortnite</option>
-                                    <option value="2">CS:GO</option>
-                                    <option value="3">Valorant</option>
-                                    <option value="4">SpeedRun</option>
+                                    <option value="Fortnite">Fortnite</option>
+                                    <option value="CS:GO">CS:GO</option>
+                                    <option value="Valorant">Valorant</option>
+                                    <option value="SpeedRun">SpeedRun</option>
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label for="exampleInputTeam" class="form-label">Escolha a categoria</label>
-                                <select class="form-select form-select-lg mb-3" aria-label="Large select example">
+                                <label for="categorySelect" class="form-label">Escolha a categoria</label>
+                                <select class="form-select form-select-lg mb-3" id="categorySelect" required>
                                     <option selected>Escolha a categoria</option>
-                                    <option value="1">Torneio por Dinheiro</option>
-                                    <option value="2">Torneio Amistoso</option>
-                                    <option value="3">Torneio Nacional</option>
-                                    <option value="4">Torneio Mundial</option>
+                                    <option value="Torneio por Dinheiro">Torneio por Dinheiro</option>
+                                    <option value="Torneio Amistoso">Torneio Amistoso</option>
+                                    <option value="Torneio Nacional">Torneio Nacional</option>
+                                    <option value="Torneio Mundial">Torneio Mundial</option>
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label for="exampleInputdate" class="form-label">Data de Início</label>
-                                <input type="date" class="form-control">
+                                <label for="startDate" class="form-label">Data de Início</label>
+                                <input type="date" class="form-control" id="startDate" required>
                             </div>
                             <div class="mb-3">
-                                <label for="exampleInputdate" class="form-label">Data de Término</label>
-                                <input type="date" class="form-control">
+                                <label for="endDate" class="form-label">Data de Término</label>
+                                <input type="date" class="form-control" id="endDate" required>
                             </div>
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="submit" class="btn btn-primary">Confirmar</button>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     <div class="container-sm" style="padding: 100px;">
         <h2>Eventos Disponíveis</h2>
         <table class="table" style="border: 2px solid black;">
@@ -211,41 +210,86 @@
 <!-- Button trigger modal -->
  <div class="d-grid gap-2">
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-  Apostar
+  Avaliaçao
 </button>
 </div>
 <!-- Modal -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true"  style="background-color: transparent;">
-  <div class="modal-dialog" >
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="staticBackdropLabel">Aposta</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form>
-          <div class="mb-3">
-            <label for="exampleInputTeam" class="form-label"><select class="form-select form-select-lg mb-3" aria-label="Large select example">
-              <option selected>Escolha o time</option>
-              <option value="1">Furia</option>
-              <option value="2">Loud</option>
-              <option value="3">Liquid</option>
-              <option value="4">Hero</option>
-              <option value="5">MIBR</option>
-              <option value="6">paiN</option>
-              <option value="7">W7M</option>
-            </select></label>
-          </div>
-          <div class="mb-3">
-              <label for="exampleInputdate" class="form-label">Valor: </label>
-              <input type="number" class="form-control" min="1">
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="background-color: transparent;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Pedidos de Eventos</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-      </div>
+            <div class="modal-body">
+                <div class="container mt-5">
+                    <h2>Formulário de Avaliação</h2>
+                    <form id="evaluationForm">
+                        <div class="form-group">
+                            <label>Você aceita ou rejeita o pedido?</label>
+                            <div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="evaluation" id="accept" value="aceitar">
+                                    <label class="form-check-label" for="accept">Aceitar</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="evaluation" id="reject" value="rejeitar">
+                                    <label class="form-check-label" for="reject">Rejeitar</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="status" class="alert alert-warning" role="alert">
+                            Em Espera
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
+</div>
+
+<script>
+// Manipulação do formulário de solicitação de evento
+document.getElementById('eventRequestForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Impede o envio do formulário
+
+    // Captura os dados do evento
+    const eventName = document.getElementById('eventSelect').value;
+    const categoryName = document.getElementById('categorySelect').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+
+    
+
+    // Atualiza o status do modal de avaliação com as informações do evento
+    const statusDiv = document.getElementById('status');
+    statusDiv.textContent = `Evento: ${eventName}, Categoria: ${categoryName}, Data de Início: ${startDate}, Data de Término: ${endDate}`;
+    statusDiv.classList.remove('alert-warning');
+    statusDiv.classList.add('alert-info');
+
+    // Limpa o formulário de solicitação após a submissão
+    document.getElementById('eventRequestForm').reset();
+});
+
+// Lógica para o formulário de avaliação
+const form = document.getElementById('evaluationForm');
+const statusDiv = document.getElementById('status');
+
+form.addEventListener('change', function() {
+    const selectedOption = form.querySelector('input[name="evaluation"]:checked');
+    if (selectedOption) {
+        statusDiv.textContent = `Você selecionou: ${selectedOption.value}`;
+        statusDiv.classList.remove('alert-warning');
+        statusDiv.classList.add(selectedOption.value === 'aceitar' ? 'alert-success' : 'alert-danger');
+    } else {
+        statusDiv.textContent = 'Em Espera';
+        statusDiv.classList.remove('alert-success', 'alert-danger');
+        statusDiv.classList.add('alert-warning');
+    }
+});
+</script>
+
     <!--tirar os arquivos do cdn-->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
