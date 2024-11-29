@@ -86,7 +86,16 @@
                 </div>
             </div>
         </div>
-    <div class="container-sm" style="padding: 100px;">
+    <!-- Seção de Avaliação -->
+    <div class="container-sm" style="padding: 50px;">
+        <h2>Avaliação de Eventos Solicitados</h2>
+        <div id="evaluationSection">
+            <p>Não há eventos solicitados para avaliação.</p>
+        </div>
+    </div>
+
+    <!-- Tabela de Eventos Disponíveis -->
+    <div class="container-sm" style="padding: 50px;">
         <h2>Eventos Disponíveis</h2>
         <table class="table" style="border: 2px solid black;">
             <thead>
@@ -98,29 +107,110 @@
                     <th scope="col">Apostas</th>
                 </tr>
             </thead>
-            <tbody class="table" style="border: 2px solid black;">
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Torneio Semanal</td>
-                    <td>12/11/2024</td>
-                    <td>Em Andamento</td>
-                    <td>
-                        <form id="betForm1" onsubmit="placeBet(event, 'Torneio Semanal')">
-                            <select id="teamSelect1" required>
-                                <option value="">Selecione um time</option>
-                                <option value="furia">FURIA</option>
-                                <option value="loud">LOUD</option>
-                                <option value="w7m">W7M</option>
-                                <option value="liquid">LIQUID</option>
-                            </select>
-                            <input type="number" id="betAmount1" min="1" placeholder="Valor da Aposta" required>
-                            <button type="submit" class="btn btn-primary">Apostar</button>
-                        </form>
-                    </td>
-                </tr>
-                <!-- Adicione mais eventos aqui -->
+            <tbody id="eventsTableBody" class="table" style="border: 2px solid black;">
+                <!-- Eventos aprovados serão adicionados aqui -->
             </tbody>
         </table>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const eventsPerPage = 10; // Número de eventos por página
+        const totalEvents = 20; // Total de eventos (ajuste conforme necessário)
+
+        // Inicializa o saldo da carteira a partir do valor exibido no modal
+        let walletBalance = parseFloat(document.getElementById('saldoValue').innerText);
+
+        // Manipulação do formulário de solicitação de evento
+        document.getElementById('eventRequestForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Impede o envio do formulário
+
+            // Captura os dados do evento
+            const eventName = document.getElementById('eventSelect').value;
+            const categoryName = document.getElementById('categorySelect').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            // Cria uma nova solicitação de evento
+            const requestHTML = `
+                <div class="request">
+                    <p>Evento: ${eventName} | Categoria: ${categoryName} | Data de Início: ${startDate} | Data de Término: ${endDate}</p>
+                    <button class="btn btn-success" onclick="approveEvent('${eventName}', '${endDate}')">Aprovar</button>
+                    <button class="btn btn-danger" onclick="rejectEvent(this)">Rejeitar</button>
+                </div>
+            `;
+
+            // Adiciona a solicitação à seção de avaliação
+            const evaluationSection = document.getElementById('evaluationSection');
+            evaluationSection.innerHTML += requestHTML;
+
+            // Limpa o formulário de solicitação após a submissão
+            document.getElementById('eventRequestForm').reset();
+        });
+
+        // Função para aprovar um evento
+        function approveEvent(eventName, endDate) {
+            // Adiciona o evento à tabela de eventos disponíveis
+            const eventsTableBody = document.getElementById('eventsTableBody');
+            const newRow = document.createElement('tr');
+            const newEventNumber = eventsTableBody.children.length + 1; // Número do evento baseado na quantidade atual
+
+            newRow.innerHTML = `
+                <th scope="row">${newEventNumber}</th>
+                <td>${eventName}</td>
+                <td>${endDate}</td>
+                <td>Em Andamento</td>
+                <td>
+                    <form onsubmit="placeBet(event, '${eventName}')">
+                        <select required>
+                            <option value="">Selecione um time</option>
+                            <option value="furia">FURIA</option>
+                            <option value="loud">LOUD</option>
+                            <option value="w7m">W7M</option>
+                            <option value="liquid">LIQUID</option>
+                        </select>
+                        <input type="number" min="1" placeholder="Valor da Aposta" required>
+                        <button type="submit" class="btn btn-primary">Apostar</button>
+                    </form>
+                </td>
+            `;
+            eventsTableBody.appendChild(newRow);
+
+            // Remove a solicitação aprovada da seção de avaliação
+            const requestDiv = event.target.closest('.request');
+            requestDiv.remove();
+        }
+
+        // Função para rejeitar um evento
+        function rejectEvent(button) {
+      // Remove a solicitação rejeitada da seção de avaliação
+      const requestDiv = button.closest('.request');
+                requestDiv.remove();
+            }
+
+            // Função para processar a aposta
+            function placeBet(event, eventName) {
+                event.preventDefault(); // Impede o envio do formulário
+
+                const form = event.target;
+                const selectedTeam = form.querySelector('select').value;
+                const betAmount = parseFloat(form.querySelector('input[type="number"]').value);
+
+                if (selectedTeam && betAmount > 0) {
+                    // Verifica se o usuário tem saldo suficiente
+                    if (betAmount <= walletBalance) {
+                        walletBalance -= betAmount; // Deduz o valor da aposta do saldo
+                        document.getElementById('saldoValue').innerText = walletBalance.toFixed(2); // Atualiza o saldo exibido
+
+                        alert(`Aposta de R$ ${betAmount.toFixed(2)} no time ${selectedTeam} para o evento ${eventName} foi realizada com sucesso!`);
+                    } else {
+                        alert('Saldo insuficiente para realizar a aposta.');
+                    }
+                } else {
+                    alert('Por favor, selecione um time e insira um valor válido para a aposta.');
+                }
+            }
+        </script>
     
         <div class="pagination">
             <button id="prevPage" class="btn btn-secondary" onclick="changePage(-1)">Anterior</button>
@@ -139,12 +229,12 @@
     </div>
     
     <script>
-        let currentPage = 1;
-        const eventsPerPage = 10; // Número de eventos por página
-        const totalEvents = 20; // Total de eventos (ajuste conforme necessário)
+        let currentPage1 = 1;
+        const eventsPerPage2 = 10; // Número de eventos por página
+        const totalEvents2 = 20; // Total de eventos (ajuste conforme necessário)
     
         // Inicializa o saldo da carteira a partir do valor exibido no modal
-        let walletBalance = parseFloat(document.getElementById('saldoValue').innerText);
+        let walletBalance2 = parseFloat(document.getElementById('saldoValue').innerText);
     
         function changePage(direction) {
             currentPage += direction;
@@ -207,88 +297,7 @@
     }
 
 </script>
-<!-- Button trigger modal -->
- <div class="d-grid gap-2">
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-  Avaliaçao
-</button>
-</div>
-<!-- Modal -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="background-color: transparent;">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="staticBackdropLabel">Pedidos de Eventos</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="container mt-5">
-                    <h2>Formulário de Avaliação</h2>
-                    <form id="evaluationForm">
-                        <div class="form-group">
-                            <label>Você aceita ou rejeita o pedido?</label>
-                            <div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="evaluation" id="accept" value="aceitar">
-                                    <label class="form-check-label" for="accept">Aceitar</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="evaluation" id="reject" value="rejeitar">
-                                    <label class="form-check-label" for="reject">Rejeitar</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="status" class="alert alert-warning" role="alert">
-                            Em Espera
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-</div>
 
-<script>
-// Manipulação do formulário de solicitação de evento
-document.getElementById('eventRequestForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // Impede o envio do formulário
-
-    // Captura os dados do evento
-    const eventName = document.getElementById('eventSelect').value;
-    const categoryName = document.getElementById('categorySelect').value;
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-
-    
-
-    // Atualiza o status do modal de avaliação com as informações do evento
-    const statusDiv = document.getElementById('status');
-    statusDiv.textContent = `Evento: ${eventName}, Categoria: ${categoryName}, Data de Início: ${startDate}, Data de Término: ${endDate}`;
-    statusDiv.classList.remove('alert-warning');
-    statusDiv.classList.add('alert-info');
-
-    // Limpa o formulário de solicitação após a submissão
-    document.getElementById('eventRequestForm').reset();
-});
-
-// Lógica para o formulário de avaliação
-const form = document.getElementById('evaluationForm');
-const statusDiv = document.getElementById('status');
-
-form.addEventListener('change', function() {
-    const selectedOption = form.querySelector('input[name="evaluation"]:checked');
-    if (selectedOption) {
-        statusDiv.textContent = `Você selecionou: ${selectedOption.value}`;
-        statusDiv.classList.remove('alert-warning');
-        statusDiv.classList.add(selectedOption.value === 'aceitar' ? 'alert-success' : 'alert-danger');
-    } else {
-        statusDiv.textContent = 'Em Espera';
-        statusDiv.classList.remove('alert-success', 'alert-danger');
-        statusDiv.classList.add('alert-warning');
-    }
-});
-</script>
 
     <!--tirar os arquivos do cdn-->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
